@@ -14,7 +14,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.io.*;
@@ -97,7 +96,7 @@ public class Controller extends Application {
 				return TEMP;
 			bb.close();
 		}
-		
+
 		catch(Exception e)
 		{
 			System.out.println("Error in File Access");
@@ -227,11 +226,19 @@ public class Controller extends Application {
 			Button Save=new Button("Add A New Contact");
 
 			Save.setOnAction(e->{
-
+				if((FnameF.getLength()>0)&&(LnameF.getLength()>0)&&(PhoneF.getLength()>0)&&(EmailF.getLength()>0))
+				{
+				TEMP=PhoneF.getText();
+				if(TEMP.matches("[0-9]*") && TEMP.length()==10)
+				{TEMP=EmailF.getText();
+				if(TEMP.matches("[[0-9]*[a-z]*[0-9]*]+[@][a-z]+[.][a-z]+"))	
+				{	
 				confirmation=AddtoFile(FnameF.getText()+"^"+LnameF.getText()+"^"+PhoneF.getText()+"^"+EmailF.getText());
 				if(confirmation==1)
 				{
 					System.out.println("Added a new Contact");
+					SuccessMsg.setText("Successfull Added a New Contact");
+					SuccessMsg.setTextFill(Color.GREEN);
 					SuccessMsg.setVisible(true);
 					FnameF.setText("");
 					LnameF.setText("");
@@ -240,7 +247,29 @@ public class Controller extends Application {
 				}
 				else
 					System.out.println("ERROR - Adding to the File..!");
-			});
+			}else
+			{
+				SuccessMsg.setText("Enter Proper Email ID");
+				SuccessMsg.setTextFill(Color.RED);
+				SuccessMsg.setVisible(true);
+			}
+				}
+				else
+				{
+					SuccessMsg.setText("Please Enter Proper Mobile Number");
+					SuccessMsg.setTextFill(Color.RED);
+					SuccessMsg.setVisible(true);
+				}
+				
+				
+				}
+			else
+				{
+				SuccessMsg.setText("Add All the Details First..!!!");
+				SuccessMsg.setTextFill(Color.RED);
+				SuccessMsg.setVisible(true);
+				}});
+				
 
 			Button Cancel=new Button("Return");
 
@@ -323,6 +352,10 @@ public class Controller extends Application {
 			Window.show();
 
 	}
+	private boolean Validate(String text)
+    {
+        return text.matches("[0-9]*");
+    }
 
 
 }
