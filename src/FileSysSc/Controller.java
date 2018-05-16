@@ -1,11 +1,16 @@
 package FileSysSc;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,6 +42,10 @@ public class Controller extends Application {
 	String Line;
 	String T1,T2;
 	ArrayList<ScContact>StreamLoader=new ArrayList<ScContact>();
+	private final TableView<ScContact> tableView = new TableView<>();
+	private final ObservableList<ScContact>dataList= FXCollections.observableArrayList();
+	 
+   
 
 
 	//--------------------------------------------
@@ -59,18 +68,67 @@ public class Controller extends Application {
 
 
 		writer.close();
-		try (Stream<String> stream = Files.lines(Paths.get(RecFile))) {
-	        stream.forEach(System.out::println);
-	}
-
 		return 1;
 		}
-		catch ( Exception E)
+		catch(Exception E)
 		{
-			System.out.println("Error : Cannot Open File");
 			return 0;
 		}
+		
 
+	}
+
+	
+	public void TableViewer() {
+		
+		TableColumn columnF1 = new TableColumn("First Name");
+        columnF1.setCellValueFactory(
+                new PropertyValueFactory<>("f1"));
+ 
+        TableColumn columnF2 = new TableColumn("Last Name");
+        columnF2.setCellValueFactory(
+                new PropertyValueFactory<>("f2"));
+ 
+        TableColumn columnF3 = new TableColumn("Phone Number");
+        columnF3.setCellValueFactory(
+                new PropertyValueFactory<>("f3"));
+ 
+        TableColumn columnF4 = new TableColumn("Email ID");
+        columnF4.setCellValueFactory(
+                new PropertyValueFactory<>("f4"));
+        
+       tableView.getItems().clear();
+        
+        tableView.setItems(dataList);
+        
+        columnF1.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+        columnF2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+        columnF3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+        columnF4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+        
+        tableView.setPrefSize(800, 400);
+        tableView.getColumns().addAll(
+                columnF1, columnF2, columnF3, columnF4);
+        Button ReTButton=new Button("Return");
+        ReTButton.setOnAction(e->{
+        	Window.setScene(Main);
+        });
+ 
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.getChildren().add(tableView);
+        vBox.getChildren().add(ReTButton);
+        
+        GridPane BP1=new GridPane();
+ 
+        BP1.getChildren().add(vBox);
+ 
+        Window.setScene(new Scene(BP1, 800,500 ));
+        Window.show();
+ 
+        readCSV();
+		
+		
 	}
 
 	// Core Function #2 - Searching the File.
@@ -104,7 +162,20 @@ public class Controller extends Application {
 
 		return "The Item : "+Item+" not Found in the Contact List";
 	}
-
+	//Core Function #3 : Show All Contacts
+	public void ShowAllContacts()
+	{
+		try (Stream<String> stream = Files.lines(Paths.get(RecFile))) {
+	        stream.forEach(System.out::println);
+	}
+		catch( Exception E)
+		{
+			System.out.println("Error : Cannot Open File");
+			
+		}
+	
+		
+	}
 
 
 	// Beginning of Interface.
@@ -122,6 +193,8 @@ public class Controller extends Application {
 			 HB.setPadding(new Insets(25, 25, 15, 12));
 			 HB.setSpacing(10);
 
+			//HB.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+			 
 			 VB.setPadding(new Insets(15, 12, 15, 12));
 			 VB.setSpacing(10);
 
@@ -157,6 +230,19 @@ public class Controller extends Application {
 
 			Button ViewAC=new Button("View All Contacts");
 			ViewAC.setPrefSize(200,20);
+			ViewAC.setOnAction(e->{
+				System.out.println("\nThe Contacts Currently in the File :\n\n");
+				
+				TableViewer();
+				
+				
+				
+				
+				
+				
+				
+				ShowAllContacts();
+			});
 			SearchC.setOnAction(e->{Window.setScene(SearchWindow);
 									System.out.println("Click Registered on Search Button");	});
 
@@ -208,6 +294,7 @@ public class Controller extends Application {
 
 			Label Lname=new Label("Last Name :");
 			TextField LnameF=new TextField();
+			//LnameF.setPrefSize(40, 100);
 			LnameF.setPromptText("Enter Proper Last Name");
 			LnameF.setOnMouseClicked(e->SuccessMsg.setVisible(false));
 
@@ -274,7 +361,16 @@ public class Controller extends Application {
 			Button Cancel=new Button("Return");
 
 			Cancel.setOnAction(e->{Window.setScene(Main);
-									System.out.println("Click Registered on Search Button");	});
+									System.out.println("Click Registered on Search Button");
+									try {
+									Runtime r=Runtime.getRuntime();
+									System.out.println(r.exec("uname -a"));
+									}
+									catch(Exception V)
+									{
+										
+									}
+			});
 
 			HB1.getChildren().addAll(WelcomeTitle1);
 			VB1.getChildren().addAll(Heading1,FName,FnameF,Lname,LnameF,Email,EmailF,Phone,PhoneF);
@@ -327,7 +423,7 @@ public class Controller extends Application {
 				SearchText.setPromptText("Enter Something Here First...!");
 		});
 		Return.setOnAction(e->{
-			System.out.println("Returning to Home Screen");
+			System.out.println("Returning to Home S");
 			Window.setScene(Main);
 		});
 
@@ -339,9 +435,6 @@ public class Controller extends Application {
 		BP3.add(HB2, 0, 2);
 		BP3.add(VB2, 0,4);
 		SearchWindow=new Scene(BP3,800,400);
-
-
-
 
 //---------------------------------------------------------------------------
 
@@ -356,6 +449,35 @@ public class Controller extends Application {
     {
         return text.matches("[0-9]*");
     }
-
+	
+	
+	private void readCSV() {
+		 
+        
+        String FieldDelimiter = "^";
+        dataList.removeAll();
+ 
+        BufferedReader br;
+ 
+        try {
+            br = new BufferedReader(new FileReader(RecFile));
+ 
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split("#");
+                //System.out.println("ddddd"+fields[4]+"jjjjjjj");
+ 
+                ScContact record = new ScContact(fields[0], fields[1], fields[2],fields[3],fields[4]);
+                dataList.add(record);
+ 
+            }
+ 
+        } catch (FileNotFoundException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
+ 
+    }
 
 }
