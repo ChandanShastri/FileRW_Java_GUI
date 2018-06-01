@@ -42,14 +42,15 @@ public class Controller extends Application {
 	static Stage Window;
 	static Scene Main,AddFile,SearchWindow,ShowAll;;
 	int HashValue;
-	String RecFile="/home/chandan_shastri/Project/file.txt";
+	static String RecFile="/home/chandan_shastri/Project/file.txt";
+	static String TempFile="/home/chandan_shastri/Project/Tempfile.txt";
 	int confirmation=0;
 	String TEMP;
 	String Line;
 	String T1,T2;
 	ArrayList<ScContact>StreamLoader=new ArrayList<ScContact>();
 	private final static TableView<ScContact> tableView = new TableView<>();
-	private final ObservableList<ScContact>dataList= FXCollections.observableArrayList();
+	private final static ObservableList<ScContact>dataList= FXCollections.observableArrayList();
 	static TableColumn columnF1=new TableColumn("First Name");;
 	static TableColumn columnF2 = new TableColumn("Last Name");
 	static TableColumn columnF3 = new TableColumn("Phone Number");
@@ -57,6 +58,7 @@ public class Controller extends Application {
 	 
 	
 	String FFF;
+	static Label msgs=new Label();
 	
 	
 	static VBox vBox = new VBox();
@@ -73,6 +75,58 @@ public class Controller extends Application {
    
 	 
 	}
+	
+	
+	public static void RESET()
+	{
+		msgs.setVisible(false);
+	}
+	
+	public static void deleteContact()
+	{
+		ScContact DelItem = tableView.getSelectionModel().getSelectedItem();
+		if(DelItem==null)
+		{
+			msgs.setText("Select a Contact First");
+			msgs.setVisible(true);
+			return;
+		}
+		String DelT=DelItem.getF1()+"#"+DelItem.getF2()+"#"+DelItem.getF3()+"#"+DelItem.getF4();
+		System.out.println("Selected Item is : "+DelT);
+		File Original = new File(RecFile);
+		File Modified = new File(TempFile);
+		try {
+
+		BufferedReader reader = new BufferedReader(new FileReader(Original));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(Modified));
+		
+		String lineToRemove = DelT;
+		lineToRemove=DelT.trim();
+		String currentLine;
+
+		while((currentLine = reader.readLine()) != null) {
+		    
+		    String trimmedLine = currentLine.trim();
+		    if(trimmedLine.contains(lineToRemove))
+		    	{
+		    		msgs.setText("  Contact of "+DelItem.getF1()+" has been Deleted ");
+		    		msgs.setVisible(true);
+		    		continue;
+		    	}
+		    writer.write(currentLine + System.getProperty("line.separator"));
+		}
+		writer.close(); 
+		reader.close(); 
+		}
+		catch(Exception e)
+		{
+			System.out.println("\n\nAn Error Occured : "+e);
+		}
+		boolean successful = Modified.renameTo(Original);
+		
+		
+	}
+	
 	
 
 	//--------------------------------------------
@@ -97,18 +151,34 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 	    tableView.setPrefSize(800, 300);
 		 tableView.getColumns().addAll(columnF1, columnF2, columnF3, columnF4);
+		 msgs.setFont(Font.font("Verdana",FontWeight.BOLD,15));
+		 msgs.setTextFill(Color.RED);
+		
 		 
 	     Button ReTButton=new Button("Return");
 	     ReTButton.setOnAction(e->{
+	    	 	RESET();
 	        	Window.setScene(Main);
 	        });
-	     ShowAll=new Scene(BPSHA, 800,500 );
+	     Button DelButton=new Button("Delete");
+	     DelButton.setOnAction(e->{
+	    	 deleteContact();
+	    	 TableViewer();
+	        });
 	     
+	     
+	     
+	     ShowAll=new Scene(BPSHA, 800,400 );
+	     HBox hbv=new HBox();
+	     hbv.setSpacing(10);
+	     hbv.getChildren().add(ReTButton);
+	     hbv.getChildren().add(DelButton);
+	     hbv.getChildren().add(msgs);
+	     msgs.setVisible(false);
 	     
 	     vBox.setSpacing(10);
 	     vBox.getChildren().add(tableView);
-	     vBox.getChildren().add(ReTButton);
-	     
+	     vBox.getChildren().add(hbv);
 	    
 
 	     BPSHA.getChildren().add(vBox);
@@ -140,7 +210,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	}
 
 	
-	public void TableViewer() {
+	public static void TableViewer() {
 		
 		
         
@@ -225,6 +295,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 		return "The Item : "+Item+" not Found in the Contact List";
 	}
+	
 	
 	
 	
@@ -403,7 +474,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 				if(confirmation==1)
 				{	FFF="/home/chandan_shastri/"+FnameF.getText()+".txt";
 					String G=FilePath.getText();
-					System.out.println(FFF+" "+G);
+					//System.out.println(FFF+" "+G);
 					System.out.println("Added a new Contact");
 					SuccessMsg.setText("Successfull Added a New Contact");
 					File dirFrom = new File(G);
@@ -459,8 +530,8 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 			Cancel.setOnAction(e->{Window.setScene(Main);
 									System.out.println("Click Registered on Search Button");
 									try {
-									Runtime r=Runtime.getRuntime();
-									System.out.println(r.exec("uname -a"));
+									//Runtime r=Runtime.getRuntime();
+									//System.out.println(r.exec("uname -a"));
 									}
 									catch(Exception V)
 									{
@@ -559,7 +630,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	    Files.copy( from.toPath(), to.toPath() );
 	} 
 	*/
-	private void readCSV() {
+	private static void readCSV() {
 		 
         
         String FieldDelimiter = "^";
