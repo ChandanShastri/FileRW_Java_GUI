@@ -159,9 +159,9 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
         readCSV();
  
         
- 
+        Window.setScene(ShowAll);
         
-        ShowAll=new Scene(BPSHA, 800,500 );
+        //ShowAll=new Scene(BPSHA, 800,500 );
         
         
  
@@ -302,7 +302,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 				System.out.println("\nThe Contacts Currently in the File :\n\n");
 				
 				TableViewer();
-				Window.setScene(ShowAll);
+				
 				//ShowAllContacts();
 			});
 			SearchC.setOnAction(e->{Window.setScene(SearchWindow);
