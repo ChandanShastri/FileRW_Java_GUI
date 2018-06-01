@@ -55,6 +55,9 @@ public class Controller extends Application {
 	static TableColumn columnF2 = new TableColumn("Last Name");
 	static TableColumn columnF3 = new TableColumn("Phone Number");
 	static TableColumn  columnF4 = new TableColumn("Email ID");
+	static ArrayList<String>PhoneList=new ArrayList<String>();
+	static ArrayList<String>EmailList=new ArrayList<String>();
+	static ArrayList<String>HashList=new ArrayList<String>();
 	 
 	static Label Header=new Label();
 	static Label EmptySpace=new Label();
@@ -65,14 +68,36 @@ public class Controller extends Application {
 	static VBox vBox = new VBox();
 	static GridPane BPSHA=new GridPane();
 	
-	
+	static Label SuccessMsg=new Label("Saved Successfully");
 	
 	static Button ReTButton=new Button("Return");
 	
 	
-	public void initTable()
+	public static void initTable()
 	{
-	
+		PhoneList.clear();
+		EmailList.clear();
+		HashList.clear();
+		
+		BufferedReader br;
+		 
+        try {
+            br = new BufferedReader(new FileReader(RecFile));
+ 
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split("#");
+               
+                PhoneList.add(fields[2].toUpperCase());
+                EmailList.add(fields[3].toUpperCase());
+                HashList.add(fields[4].toUpperCase());
+ 
+            }
+ 
+        } catch (Exception ex) {
+            System.out.println("An Error Occured "+ex);
+        } 
+		
    
 	 
 	}
@@ -81,6 +106,7 @@ public class Controller extends Application {
 	public static void RESET()
 	{
 		msgs.setVisible(false);
+		initTable();
 	}
 	
 	public static void deleteContact()
@@ -123,8 +149,9 @@ public class Controller extends Application {
 		{
 			System.out.println("\n\nAn Error Occured : "+e);
 		}
-		boolean successful = Modified.renameTo(Original);
 		
+		boolean successful = Modified.renameTo(Original);
+		initTable();
 		
 	}
 	
@@ -133,6 +160,8 @@ public class Controller extends Application {
 	//--------------------------------------------
 
 	public static void main(String[] args) {
+		
+		initTable();
 
 columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
@@ -160,11 +189,13 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		EmptySpace.setText("          ");
 		 
 	     Button ReTButton=new Button("Return");
+	     ReTButton.setTextFill(Color.GREEN);
 	     ReTButton.setOnAction(e->{
 	    	 	RESET();
 	        	Window.setScene(Main);
 	        });
 	     Button DelButton=new Button("Delete");
+	     DelButton.setTextFill(Color.RED);
 	     DelButton.setOnAction(e->{
 	    	 deleteContact();
 	    	 TableViewer();
@@ -205,12 +236,14 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 
 		writer.close();
+		initTable();
 		return 1;
 		}
 		catch(Exception E)
 		{
 			return 0;
 		}
+		
 		
 
 	}
@@ -224,15 +257,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
         
         tableView.setItems(dataList);
         
-        
-        
-        
-        
-       
-        
-       
-        
-        readCSV();
+        ScFileReader();
  
         Header.setText("                                     All Contacts ");
         Window.setScene(ShowAll);
@@ -298,14 +323,6 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 			
 			Header.setText("                                   Search Results ");
 			tableView.setItems(dataList);
-			
-			
-	        
-			
-	        
-	 
-	        
-	        
 			if(TEMP.length()>0)
 				return TEMP;
 			bb.close();
@@ -340,7 +357,31 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	
 	public static int DuplicateChecker(String NC)
 	{
+		initTable();
+		String[] NewContact=NC.split("#");
+		String HS=Integer.toString(NC.hashCode());
 		
+		
+		if(HashList.contains(HS))
+		{
+			SuccessMsg.setText("This Contact Already Exists....!");
+			SuccessMsg.setVisible(true);
+			return 1;
+		}
+		else
+		if(PhoneList.contains(NewContact[2].toUpperCase()))
+		{	SuccessMsg.setText("Phone Number Already Exits....!");
+			SuccessMsg.setVisible(true);
+			return 1;
+		}
+		
+		else if(EmailList.contains(NewContact[3].toUpperCase()))
+		{
+			SuccessMsg.setText("Email ID Already Exits....!");
+			SuccessMsg.setVisible(true);
+			return 1;
+		}
+		else
 		return 0;
 	}
 
@@ -350,7 +391,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	@Override
 	public void start(Stage mainstage) throws Exception {
 		
-		Label SuccessMsg=new Label("Saved Successfully");
+		
 			Window=mainstage;
 			Window.setResizable(false);
 			GridPane BP=new GridPane();
@@ -358,11 +399,12 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 			VBox VB=new VBox();
 			
 
-			 HB.setPadding(new Insets(25, 25, 15, 12));
+			 HB.setPadding(new Insets(30, 25, 15, 12));
 			 HB.setSpacing(10);
+			 HB.setPrefSize(500,100);
 			 HB.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
 
-			VB.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
+			VB.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
 			 
 			 VB.setPadding(new Insets(15, 12, 15, 12));
 			 VB.setSpacing(10);
@@ -370,12 +412,12 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 
 			// Scene 1 - Configuration.
-			BP.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+			BP.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
 			BP.setPadding(new Insets(10,10,10,10));
 
 
 			// Screen 1 Begins Here.
-			Label WelcomeTitle=new Label("Welcome to Contacts Application");
+			Label WelcomeTitle=new Label("        Welcome to Contacts Application");
 			WelcomeTitle.setFont(Font.font("Times New Roman", FontWeight.BOLD,FontPosture.REGULAR, 20));
 			WelcomeTitle.setTextFill(Color.RED);
 
@@ -386,6 +428,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 
 			Button AddC=new Button("Add A New Contact");
+			
 			AddC.setPrefSize(200,20);
 
 			AddC.setOnAction(e->{
@@ -484,13 +527,9 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 			
 			/*-----------------------------------------------------*/
 			
-			
-			
-			
-
-			
 
 			Button Save=new Button("Add A New Contact");
+			Save.setTextFill(Color.RED);
 
 			Save.setOnAction(e->{
 				if((FnameF.getLength()>0)&&(LnameF.getLength()>0)&&(PhoneF.getLength()>0)&&(EmailF.getLength()>0))
@@ -560,16 +599,13 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 				
 
 			Button Cancel=new Button("Return");
+			Cancel.setTextFill(Color.GREEN);
 
 			Cancel.setOnAction(e->{
 				RESET();
 				Window.setScene(Main);
 			
 			});
-			
-			
-			
-			
 
 			HB1.getChildren().addAll(WelcomeTitle1);
 			VB1.getChildren().addAll(Heading1,FName,FnameF,Lname,LnameF,Email,EmailF,Phone,PhoneF);
@@ -602,14 +638,16 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		Label SearchTitle=new Label("Enter name or email to Search : ");
 
 		SearchTitle.setFont(Font.font("Verdana", FontWeight.BOLD,20));
-		SearchTitle.setTextFill(Color.RED);
+		SearchTitle.setTextFill(Color.BLUE);
 
 		TextField SearchText=new TextField();
 		SearchText.setPromptText("Enter the name or Email ID");
 		//SearchText.setPrefSize(30, 5);
 
 		Button SearchNow=new Button("Search");
+		SearchNow.setTextFill(Color.BLUE);
 		Button Return=new Button("Return");
+		Return.setTextFill(Color.GREEN);
 
 		//SearchNow.setPrefSize(25,3);
 		SearchNow.setOnAction(e->{
@@ -668,7 +706,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	    Files.copy( from.toPath(), to.toPath() );
 	} 
 	*/
-	private static void readCSV() {
+	private static void ScFileReader() {
 		 
         
         String FieldDelimiter = "^";
