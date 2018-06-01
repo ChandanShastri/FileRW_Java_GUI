@@ -56,7 +56,8 @@ public class Controller extends Application {
 	static TableColumn columnF3 = new TableColumn("Phone Number");
 	static TableColumn  columnF4 = new TableColumn("Email ID");
 	 
-	
+	static Label Header=new Label();
+	static Label EmptySpace=new Label();
 	String FFF;
 	static Label msgs=new Label();
 	
@@ -153,7 +154,10 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		 tableView.getColumns().addAll(columnF1, columnF2, columnF3, columnF4);
 		 msgs.setFont(Font.font("Verdana",FontWeight.BOLD,15));
 		 msgs.setTextFill(Color.RED);
-		
+		 
+		 Header.setFont(Font.font("Verdana",FontWeight.BOLD,25));
+		 Header.setTextFill(Color.BLUE);
+		EmptySpace.setText("          ");
 		 
 	     Button ReTButton=new Button("Return");
 	     ReTButton.setOnAction(e->{
@@ -171,12 +175,14 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 	     ShowAll=new Scene(BPSHA, 800,400 );
 	     HBox hbv=new HBox();
 	     hbv.setSpacing(10);
+	     hbv.getChildren().add(EmptySpace);
 	     hbv.getChildren().add(ReTButton);
 	     hbv.getChildren().add(DelButton);
 	     hbv.getChildren().add(msgs);
 	     msgs.setVisible(false);
 	     
 	     vBox.setSpacing(10);
+	     vBox.getChildren().add(Header);
 	     vBox.getChildren().add(tableView);
 	     vBox.getChildren().add(hbv);
 	    
@@ -228,16 +234,12 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
         
         readCSV();
  
-        
+        Header.setText("                                     All Contacts ");
         Window.setScene(ShowAll);
         
         //ShowAll=new Scene(BPSHA, 800,500 );
         
-        
  
-        
-		
-		
 	}
 
 	
@@ -248,32 +250,53 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		
 		 tableView.getItems().clear();
 	        
-		 
+		 String[] Items = Item.split(" ");
+		 String[] LineItems;
+		 boolean Flag;
 	        
 		try {
 			BufferedReader bb=new BufferedReader(new FileReader(RecFile));
 			TEMP="";
 			 tableView.getItems().clear();
 			while((Line=bb.readLine())!=null)
-			{	T1=Item;
+			{	
+				Flag=false;
+				T1=Item;
 				T1=T1.toUpperCase();
 				T2=Line;
 				T2=T2.toUpperCase();
-
-				if(T2.contains(T1))
+				LineItems=Line.split("#");
+				
+				for (String TX : LineItems)
 				{
-					//System.out.println(Line);
+					TX=TX.toUpperCase();
+					for(String FT:Items)
+					{
+						FT=FT.toUpperCase();
+						if(TX.startsWith(FT))
+				{
+					
 					String[] fields = Line.split("#");
-	                //System.out.println("ddddd"+fields[4]+"jjjjjjj");
+	                
 	 
 	                ScContact record = new ScContact(fields[0], fields[1], fields[2],fields[3],fields[4]);
 	                dataList.add(record);
-				 
+	                
+	                Flag=true;
 				        
 					//TEMP=TEMP+"\n"+Line;
 				}
+						if(Flag==true)
+						{
+							break;
+						}
+				}
+					if(Flag==true)
+					break;
+					}
 			}
 			
+			Header.setText("                                   Search Results ");
 			tableView.setItems(dataList);
 			
 			
@@ -312,6 +335,13 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		}
 	
 		
+	}
+	
+	
+	public static int DuplicateChecker(String NC)
+	{
+		
+		return 0;
 	}
 
 
@@ -470,7 +500,10 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 				{TEMP=EmailF.getText();
 				if(TEMP.matches("[[0-9]*[a-z]*[0-9]*]+[@][a-z]+[.][a-z]+"))	
 				{	
-				confirmation=AddtoFile(FnameF.getText()+"#"+LnameF.getText()+"#"+PhoneF.getText()+"#"+EmailF.getText());
+				TEMP=FnameF.getText()+"#"+LnameF.getText()+"#"+PhoneF.getText()+"#"+EmailF.getText();	
+				if(DuplicateChecker(TEMP)==0)
+				{	
+				confirmation=AddtoFile(TEMP);
 				if(confirmation==1)
 				{	FFF="/home/chandan_shastri/"+FnameF.getText()+".txt";
 					String G=FilePath.getText();
@@ -501,6 +534,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 				}
 				else
 					System.out.println("ERROR - Adding to the File..!");
+				}
 			}else
 			{
 				SuccessMsg.setText("Enter Proper Email ID");
@@ -527,16 +561,10 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 			Button Cancel=new Button("Return");
 
-			Cancel.setOnAction(e->{Window.setScene(Main);
-									System.out.println("Click Registered on Search Button");
-									try {
-									//Runtime r=Runtime.getRuntime();
-									//System.out.println(r.exec("uname -a"));
-									}
-									catch(Exception V)
-									{
-										
-									}
+			Cancel.setOnAction(e->{
+				RESET();
+				Window.setScene(Main);
+			
 			});
 			
 			
@@ -551,7 +579,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 			BP1.add(HB1,0,1);
 			BP1.add(VB1,0,3);
 			BP1.add(HB11,0,4);
-		AddFile=new Scene(BP1,800,600);
+		AddFile=new Scene(BP1,800,450);
 
 
 // -----------------------------------------------------------------------------------------------
@@ -586,22 +614,32 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		//SearchNow.setPrefSize(25,3);
 		SearchNow.setOnAction(e->{
 			System.out.println("\nSearch Started\n\n");
-			if(SearchText.getText().length()>0)
+			if(SearchText.getText().length()>=3)
 			{
 				tableView.getItems().clear();
 			SearchFile(SearchText.getText());
 			Window.setScene(ShowAll);
 			//System.out.println(TEMP);
 			}
+			else if(SearchText.getText().length()>=1)
+			{
+				SearchText.setPromptText("Too Short to Search...!!");
+				msgs.setText("Too Short to Search...!");
+				msgs.setVisible(true);
+			}	
 			else
+			{
 				SearchText.setPromptText("Enter Something Here First...!");
+				msgs.setText("Enter Something to Search...!");
+				msgs.setVisible(true);
+			}
 		});
 		Return.setOnAction(e->{
 			System.out.println("Returning to Home ");
 			Window.setScene(Main);
 		});
 
-		HB21.getChildren().addAll(SearchNow,Return);
+		HB21.getChildren().addAll(SearchNow,Return,msgs);
 
 		HB2.getChildren().addAll(SearchTitle);
 		VB2.getChildren().addAll(SearchText,HB21);
@@ -616,7 +654,7 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 
 
 			Window.setScene(Main);
-			Window.setTitle("AIET ISE - File Structure Mini Project");
+			Window.setTitle("Chandan Shastri's File Structure Mini Project");
 			Window.show();
 
 	}
