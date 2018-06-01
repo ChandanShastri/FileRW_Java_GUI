@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,6 +12,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,8 +26,10 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.io.*;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 /* Coding By Chandan Shastri
  * crshastri@gmail.com
@@ -33,24 +39,79 @@ public class Controller extends Application {
 
 	// Universal Declarations.
 
-	Stage Window;
-	Scene Main,AddFile,SearchWindow;
+	static Stage Window;
+	static Scene Main,AddFile,SearchWindow,ShowAll;;
 	int HashValue;
-	String RecFile="/home/chandan_shastri/file.txt";
+	String RecFile="/home/chandan_shastri/Project/file.txt";
 	int confirmation=0;
 	String TEMP;
 	String Line;
 	String T1,T2;
 	ArrayList<ScContact>StreamLoader=new ArrayList<ScContact>();
-	private final TableView<ScContact> tableView = new TableView<>();
+	private final static TableView<ScContact> tableView = new TableView<>();
 	private final ObservableList<ScContact>dataList= FXCollections.observableArrayList();
+	static TableColumn columnF1=new TableColumn("First Name");;
+	static TableColumn columnF2 = new TableColumn("Last Name");
+	static TableColumn columnF3 = new TableColumn("Phone Number");
+	static TableColumn  columnF4 = new TableColumn("Email ID");
 	 
+	
+	String FFF;
+	
+	
+	static VBox vBox = new VBox();
+	static GridPane BPSHA=new GridPane();
+	
+	
+	
+	static Button ReTButton=new Button("Return");
+	
+	
+	public void initTable()
+	{
+	
    
-
+	 
+	}
+	
 
 	//--------------------------------------------
 
 	public static void main(String[] args) {
+
+columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
+
+	    
+	    columnF2.setCellValueFactory(new PropertyValueFactory<>("f2"));
+
+	    
+	    columnF3.setCellValueFactory(new PropertyValueFactory<>("f3"));
+
+	   
+	    columnF4.setCellValueFactory(new PropertyValueFactory<>("f4"));
+	    
+	    columnF1.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+	    columnF2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
+	    columnF3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+	    columnF4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
+
+	    tableView.setPrefSize(800, 300);
+		 tableView.getColumns().addAll(columnF1, columnF2, columnF3, columnF4);
+		 
+	     Button ReTButton=new Button("Return");
+	     ReTButton.setOnAction(e->{
+	        	Window.setScene(Main);
+	        });
+	     ShowAll=new Scene(BPSHA, 800,500 );
+	     
+	     
+	     vBox.setSpacing(10);
+	     vBox.getChildren().add(tableView);
+	     vBox.getChildren().add(ReTButton);
+	     
+	    
+
+	     BPSHA.getChildren().add(vBox);
 		launch(args);
 
 	}
@@ -64,7 +125,7 @@ public class Controller extends Application {
 			        new FileOutputStream(RecFile, true), "UTF-8"));
 		 HashValue=Line.hashCode();
 
-		 writer.write(Line+"^"+HashValue+"\n");
+		 writer.write(Line+"#"+HashValue+"\n");
 
 
 		writer.close();
@@ -81,63 +142,48 @@ public class Controller extends Application {
 	
 	public void TableViewer() {
 		
-		TableColumn columnF1 = new TableColumn("First Name");
-        columnF1.setCellValueFactory(
-                new PropertyValueFactory<>("f1"));
- 
-        TableColumn columnF2 = new TableColumn("Last Name");
-        columnF2.setCellValueFactory(
-                new PropertyValueFactory<>("f2"));
- 
-        TableColumn columnF3 = new TableColumn("Phone Number");
-        columnF3.setCellValueFactory(
-                new PropertyValueFactory<>("f3"));
- 
-        TableColumn columnF4 = new TableColumn("Email ID");
-        columnF4.setCellValueFactory(
-                new PropertyValueFactory<>("f4"));
+		
         
        tableView.getItems().clear();
         
         tableView.setItems(dataList);
         
-        columnF1.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
-        columnF2.prefWidthProperty().bind(tableView.widthProperty().multiply(0.2));
-        columnF3.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
-        columnF4.prefWidthProperty().bind(tableView.widthProperty().multiply(0.3));
         
-        tableView.setPrefSize(800, 400);
-        tableView.getColumns().addAll(
-                columnF1, columnF2, columnF3, columnF4);
-        Button ReTButton=new Button("Return");
-        ReTButton.setOnAction(e->{
-        	Window.setScene(Main);
-        });
- 
-        VBox vBox = new VBox();
-        vBox.setSpacing(10);
-        vBox.getChildren().add(tableView);
-        vBox.getChildren().add(ReTButton);
         
-        GridPane BP1=new GridPane();
- 
-        BP1.getChildren().add(vBox);
- 
-        Window.setScene(new Scene(BP1, 800,500 ));
-        Window.show();
- 
+        
+        
+       
+        
+       
+        
         readCSV();
+ 
+        
+ 
+        
+        ShowAll=new Scene(BPSHA, 800,500 );
+        
+        
+ 
+        
 		
 		
 	}
 
+	
 	// Core Function #2 - Searching the File.
 
 	public String SearchFile(String Item)
 	{
+		
+		 tableView.getItems().clear();
+	        
+		 
+	        
 		try {
 			BufferedReader bb=new BufferedReader(new FileReader(RecFile));
 			TEMP="";
+			 tableView.getItems().clear();
 			while((Line=bb.readLine())!=null)
 			{	T1=Item;
 				T1=T1.toUpperCase();
@@ -147,9 +193,26 @@ public class Controller extends Application {
 				if(T2.contains(T1))
 				{
 					//System.out.println(Line);
-					TEMP=TEMP+"\n"+Line;
+					String[] fields = Line.split("#");
+	                //System.out.println("ddddd"+fields[4]+"jjjjjjj");
+	 
+	                ScContact record = new ScContact(fields[0], fields[1], fields[2],fields[3],fields[4]);
+	                dataList.add(record);
+				 
+				        
+					//TEMP=TEMP+"\n"+Line;
 				}
 			}
+			
+			tableView.setItems(dataList);
+			
+			
+	        
+			
+	        
+	 
+	        
+	        
 			if(TEMP.length()>0)
 				return TEMP;
 			bb.close();
@@ -157,11 +220,14 @@ public class Controller extends Application {
 
 		catch(Exception e)
 		{
-			System.out.println("Error in File Access");
+			System.out.println("Error in File Access - A small exception Occured \n"+e);
 		}
 
 		return "The Item : "+Item+" not Found in the Contact List";
 	}
+	
+	
+	
 	//Core Function #3 : Show All Contacts
 	public void ShowAllContacts()
 	{
@@ -182,26 +248,28 @@ public class Controller extends Application {
 
 	@Override
 	public void start(Stage mainstage) throws Exception {
-
+		
 		Label SuccessMsg=new Label("Saved Successfully");
 			Window=mainstage;
 			Window.setResizable(false);
 			GridPane BP=new GridPane();
 			HBox HB=new HBox();
 			VBox VB=new VBox();
+			
 
 			 HB.setPadding(new Insets(25, 25, 15, 12));
 			 HB.setSpacing(10);
+			 HB.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
 
-			//HB.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+			VB.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
 			 
 			 VB.setPadding(new Insets(15, 12, 15, 12));
 			 VB.setSpacing(10);
-
+			 initTable();
 
 
 			// Scene 1 - Configuration.
-
+			BP.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
 			BP.setPadding(new Insets(10,10,10,10));
 
 
@@ -234,14 +302,8 @@ public class Controller extends Application {
 				System.out.println("\nThe Contacts Currently in the File :\n\n");
 				
 				TableViewer();
-				
-				
-				
-				
-				
-				
-				
-				ShowAllContacts();
+				Window.setScene(ShowAll);
+				//ShowAllContacts();
 			});
 			SearchC.setOnAction(e->{Window.setScene(SearchWindow);
 									System.out.println("Click Registered on Search Button");	});
@@ -286,7 +348,7 @@ public class Controller extends Application {
 
 			Label Heading1=new Label("Please Fill all the Fields :");
 			Heading1.setFont(Font.font("Verdana",FontWeight.BOLD,15));
-
+			
 			Label FName=new Label("First Name :");
 			TextField FnameF=new TextField();
 			FnameF.setPromptText("Enter Proper First Name");
@@ -307,8 +369,25 @@ public class Controller extends Application {
 			TextField EmailF=new TextField();
 			EmailF.setPromptText("Enter Email ID");
 			EmailF.setOnMouseClicked(e->SuccessMsg.setVisible(false));
+			
+			/*---------------------------------------------------*/
+			
+			Label FileName=new Label("File Name with Full Path :");
+			TextField FilePath=new TextField();
+			FilePath.setPromptText("Enter Path to File");
+			FilePath.setOnMouseClicked(e->SuccessMsg.setVisible(false));
+			
+			
+			//Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+			
+			
+			/*-----------------------------------------------------*/
+			
+			
+			
+			
 
-
+			
 
 			Button Save=new Button("Add A New Contact");
 
@@ -320,11 +399,28 @@ public class Controller extends Application {
 				{TEMP=EmailF.getText();
 				if(TEMP.matches("[[0-9]*[a-z]*[0-9]*]+[@][a-z]+[.][a-z]+"))	
 				{	
-				confirmation=AddtoFile(FnameF.getText()+"^"+LnameF.getText()+"^"+PhoneF.getText()+"^"+EmailF.getText());
+				confirmation=AddtoFile(FnameF.getText()+"#"+LnameF.getText()+"#"+PhoneF.getText()+"#"+EmailF.getText());
 				if(confirmation==1)
-				{
+				{	FFF="/home/chandan_shastri/"+FnameF.getText()+".txt";
+					String G=FilePath.getText();
+					System.out.println(FFF+" "+G);
 					System.out.println("Added a new Contact");
 					SuccessMsg.setText("Successfull Added a New Contact");
+					File dirFrom = new File(G);
+					File dirTo = new File(FFF);
+					
+					/*
+					try {
+					        //copyFile(dirFrom, dirTo);
+					        Files.copy(dirFrom.toPath(),dirTo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					} catch (IOException ex) {
+					       // Logger.getLogger(TestJava8.class.getName()).log(Level.SEVERE, null, ex);
+					}
+					//Files.copy(dirFrom, dirTo, StandardCopyOption.REPLACE_EXISTING);
+					*/
+					
+					
+	
 					SuccessMsg.setTextFill(Color.GREEN);
 					SuccessMsg.setVisible(true);
 					FnameF.setText("");
@@ -371,6 +467,10 @@ public class Controller extends Application {
 										
 									}
 			});
+			
+			
+			
+			
 
 			HB1.getChildren().addAll(WelcomeTitle1);
 			VB1.getChildren().addAll(Heading1,FName,FnameF,Lname,LnameF,Email,EmailF,Phone,PhoneF);
@@ -416,14 +516,17 @@ public class Controller extends Application {
 		SearchNow.setOnAction(e->{
 			System.out.println("\nSearch Started\n\n");
 			if(SearchText.getText().length()>0)
-			{TEMP=SearchFile(SearchText.getText());
-			System.out.println(TEMP);
+			{
+				tableView.getItems().clear();
+			SearchFile(SearchText.getText());
+			Window.setScene(ShowAll);
+			//System.out.println(TEMP);
 			}
 			else
 				SearchText.setPromptText("Enter Something Here First...!");
 		});
 		Return.setOnAction(e->{
-			System.out.println("Returning to Home S");
+			System.out.println("Returning to Home ");
 			Window.setScene(Main);
 		});
 
@@ -434,6 +537,7 @@ public class Controller extends Application {
 
 		BP3.add(HB2, 0, 2);
 		BP3.add(VB2, 0,4);
+		BP.setAlignment(Pos.CENTER);
 		SearchWindow=new Scene(BP3,800,400);
 
 //---------------------------------------------------------------------------
@@ -450,7 +554,11 @@ public class Controller extends Application {
         return text.matches("[0-9]*");
     }
 	
-	
+	/*
+	public static void copyFile( File from, File to ) throws IOException {
+	    Files.copy( from.toPath(), to.toPath() );
+	} 
+	*/
 	private void readCSV() {
 		 
         
@@ -465,7 +573,7 @@ public class Controller extends Application {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split("#");
-                //System.out.println("ddddd"+fields[4]+"jjjjjjj");
+               
  
                 ScContact record = new ScContact(fields[0], fields[1], fields[2],fields[3],fields[4]);
                 dataList.add(record);
