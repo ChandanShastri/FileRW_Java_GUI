@@ -370,14 +370,14 @@ columnF1.setCellValueFactory(new PropertyValueFactory<>("f1"));
 		}
 		else
 		if(PhoneList.contains(NewContact[2].toUpperCase()))
-		{	SuccessMsg.setText("Phone Number Already Exits....!");
+		{	SuccessMsg.setText("Phone Number Already Exists....!");
 			SuccessMsg.setVisible(true);
 			return 1;
 		}
 		
 		else if(EmailList.contains(NewContact[3].toUpperCase()))
 		{
-			SuccessMsg.setText("Email ID Already Exits....!");
+			SuccessMsg.setText("Email ID Already Exists....!");
 			SuccessMsg.setVisible(true);
 			return 1;
 		}
